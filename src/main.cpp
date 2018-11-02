@@ -20,7 +20,50 @@ std::vector<cv::Rect> GetGroundtruth(std::string txt_file);
 std::vector<double>PrecisionCalculate(std::vector<cv::Rect> groundtruth_rect, 
 				      std::vector<cv::Rect> result_rect);
 
+void test_video()
+{
+	cv::VideoCapture cap;
+
+	std::string kernel_type = "gaussian";//gaussian polynomial linear
+	std::string feature_type = "hog";//hog gray
+
+	KCF kcf_tracker(kernel_type, feature_type);
+	std::vector<cv::Rect> result_rect;
+	int frame = 0;
+
+	if (cap.open("C:\\XipingYan_Code\\Intel_work\\Hddl_samples\\hddl-samples\\cross_road_demo\\test_videos\\cross_road_1_internaldoc_.avi")) {
+		cv::Mat src;
+		for (;;) {
+			cap >> src;
+			if (src.empty()) {
+				break;
+			}
+
+			cv::Mat rsz;
+			cv::resize(src, rsz, cv::Size(448, 448));
+
+			if (frame == 0) {
+				cv::Rect initpos = cv::Rect(158, 180, 20, 60);
+				kcf_tracker.Init(rsz, initpos);
+				result_rect.push_back(initpos); //0-index
+			}
+			else {
+				result_rect.push_back(kcf_tracker.Update(rsz));
+			}
+
+			cv::Rect curRt = result_rect[result_rect.size() - 1];
+			cv::rectangle(rsz, curRt, cv::Scalar(0, 255, 0), 1);
+
+			cv::imshow("rsz", rsz);
+			cv::waitKey(0);
+			frame++;
+		}
+	}
+}
+
 int main(int argc, char **argv) {
+	test_video(); return 1;
+
   if (argc != 3) {
     std::cout << "Usage:" 
               << argv[0] << " video_base_path[./David3] Verbose[0/1]" << std::endl;
