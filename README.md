@@ -1,5 +1,5 @@
 # README
-Fork from: **  https://github.com/pingxiyan/KCF.git ** <br>
+Fork from: https://github.com/pingxiyan/KCF.git <br>
 
 # KCF
 
